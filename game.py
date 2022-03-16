@@ -1,36 +1,35 @@
 # Battleship Game For My Codecadamy CS Course
 
 # Creating ships details and methods
-class Ships:
-    def __init__(self):
-        self.ship_names = ["Carrier", "Battleship", "Destroyer", "Submarine", "Patrol Boat"]
-        # Name: [size, is_placed, is_destroyed]
-        self.ship_details = {
-            "Carrier": [5, False, False],
-            "Battleship": [4, False, False],
-            "Destroyer": [3, False, False],
-            "Submarine": [3, False, False],
-            "Patrol Boat": [2,False, False]
-            }
+class Ship:
+    def __init__(self, name, length):
+        self.name = name
+        self.length = length
+        self.is_placed = False
+        self.is_destroyed = False
+
+    def placed(self):
+        if self.is_placed == False:
+            self.is_placed = True
+
+    def destroyed(self):
+        if self.is_destroyed == False:
+            self.is_destroyed = True
+
+class Fleet:
+    carrier = Ship("Carrier", 5)
+    battleship = Ship("Battleship", 4)
+    destroyer = Ship("Destroyer", 3)
+    submarine = Ship("Submarine", 3)
+    patrol_boat = Ship("Patrol Boat", 2)
+
+    def __init__(self, owner):
+        self.owner = owner
 
     def __repr__(self):
-        print(self.ship_details.items())
-        description = "It's Ships class which contains ship names, ship sizes and methods."
+        description = ""
         return description
 
-    def placed(self, name):
-        try:
-            if self.ship_details[name][1] == False:
-                self.ship_details[name][1] = True
-        except KeyError:
-            return 0
-
-    def destroyed(self, name):
-        try:
-            if self.ship_details[name][2] == False:
-                self.ship_details[name][2] = True
-        except KeyError:
-            return 0
 
 # Creating a board to place ships
 class Board:
@@ -52,6 +51,7 @@ class Board:
         description = ""
         return description
 
+    # Checks if given coords are in right format and convert to array[x,y]
     def check_coordinate(self, x, y):
         for key, value in self.nums_to_letters_coords.items():
             if x == value:
@@ -79,14 +79,20 @@ class Board:
         return result
         
 
-    # ship - name of ship, coords in format "A1"
-    def set_ship(self, ship, coords):
-        coords_to_nums = []
+    # ship - name of ship, coords in format "LetterNumber" "A1"
+    def set_ship(self, ship_name, coords, fleet):
+        if hasattr(Fleet, ship_name):
+            coords = self.coords_to_nums(coords)
+            ship = getattr(fleet, ship_name)
+            ship_length = ship.length
+            print(ship_length)
+        else:
+            return "Unknown ship!"
 
 
 
 
-ships = Ships()
+fleet = Fleet("player")
 board = Board()
-# print(ships)
-print(board.coords_to_nums("G2"))
+
+board.set_ship("carrier", "G2", fleet)
