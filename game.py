@@ -18,6 +18,7 @@ class Ship:
             self.is_destroyed = True
 
 class Fleet:
+    ship_names = ["Carrier", "Battleship", "Destroyer", "Submarine", "Patrol Boat"]
     carrier = Ship("Carrier", 5)
     battleship = Ship("Battleship", 4)
     destroyer = Ship("Destroyer", 3)
@@ -156,15 +157,34 @@ class Player:
     def shoot(self, coords, board):
         coords = board.coords_to_nums(coords)
         coords_index = board.coords_to_index(coords)
-        print(board.get_coords(coords_index))
+        board_coords = board.get_coords(coords_index)
         
+        is_hit = False
+        for name in self.fleet.ship_names:
+            if name in board_coords[3]:
+                is_hit = True
+                if name == "Patrol Boat":
+                    name = "_".join(name.split())
+                ship = getattr(self.fleet, name.lower())
+                ship_health = getattr(ship, "health")
+                setattr(ship, "health", ship_health - 1)
+                if getattr(ship, "health") == 0:
+                    ship.destroyed()
+                    print(ship.name + " is destroyed!")
+                else:    
+                    print(ship.name + " health = " + str(getattr(ship, "health")))
+                break
+        if not is_hit:
+            print("Missed :(")
+                
+                
         
-
 
 board = Board()
 
 player_1 = Player("Alex")
+board.place_ship("patrol_boat", "A1", "up", player_1.fleet)
 player_1.shoot("A1", board)
+player_1.shoot("A0", board)
 
-# board.place_ship("carrier", "A1", "up", player_1.fleet)
 # board.place_ship("carrier", "A6", "up", player_1.fleet)
