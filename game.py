@@ -1,6 +1,9 @@
 # Battleship Game For My Codecadamy CS Course
 
 # Creating ships details and methods
+from types import NoneType
+
+
 class Ship:
     def __init__(self, name, length):
         self.name = name
@@ -19,16 +22,15 @@ class Ship:
 
 class Fleet:
     ship_names = ["Carrier", "Battleship", "Destroyer", "Submarine", "Patrol Boat"]
-    carrier = Ship("Carrier", 5)
-    battleship = Ship("Battleship", 4)
-    destroyer = Ship("Destroyer", 3)
-    submarine = Ship("Submarine", 3)
-    patrol_boat = Ship("Patrol Boat", 2)
-    ships_alive = 5
 
     def __init__(self, owner):
+        self.ships_alive = 5
         self.owner = owner
-
+        self.carrier = Ship("Carrier", 5)
+        self.battleship = Ship("Battleship", 4)
+        self.destroyer = Ship("Destroyer", 3)
+        self.submarine = Ship("Submarine", 3)
+        self.patrol_boat = Ship("Patrol Boat", 2)
     def __repr__(self):
         description = ""
         return description
@@ -115,7 +117,7 @@ class Board:
         return current_coords
 
     # Verifies if place is available and occupy it
-    def place_on_board(self, start_coords_index, direction, ship, fleet):
+    def place_on_board(self, start_coords_index, direction, ship):
         current_coords = start_coords_index
         occupied_coords = []
         for temp in range(ship.length, 0, -1):
@@ -138,7 +140,7 @@ class Board:
     def place_ship(self, ship_name, start_coords, direction, fleet):
         if ship_name == "patrol boat":
             ship_name = "_".join(ship_name.split())
-        if hasattr(Fleet, ship_name):
+        if hasattr(fleet, ship_name):
             ship = getattr(fleet, ship_name)
             if ship.is_placed == True:
                 print("Ship is already placed!")
@@ -152,7 +154,7 @@ class Board:
             if start_coords_index == None:
                 return None
 
-            if self.place_on_board(start_coords_index, direction, ship, fleet):
+            if self.place_on_board(start_coords_index, direction, ship):
                 return True
         else:
             return "Unknown ship!"
@@ -170,12 +172,17 @@ class Player:
 
     def shoot(self, coords, enemy):
         coords = enemy.board.coords_to_nums(coords)
+        while coords == None:
+            coords = str(input("Enter coordinates: "))
+            coords = enemy.board.coords_to_nums(coords)
         coords_index = enemy.board.coords_to_index(coords)
         board_coords = enemy.board.get_coords(coords_index)
         
         is_hit = False
         for name in self.fleet.ship_names:
             if name in board_coords[3]:
+                if name == "Patrol Boat":
+                    name = "_".join(name.split())
                 is_destroyed = getattr(enemy.fleet, name.lower())
                 is_destroyed = getattr(is_destroyed, "is_destroyed")
                 # if is_destroyed == True:
@@ -183,14 +190,16 @@ class Player:
                 is_hit = True
                 if name == "Patrol Boat":
                     name = "_".join(name.split())
-                ship = getattr(self.fleet, name.lower())
+                ship = getattr(enemy.fleet, name.lower())
                 ship_health = getattr(ship, "health")
                 setattr(ship, "health", ship_health - 1)
                 if getattr(ship, "health") == 0:
                     ship.destroyed()
                     print(ship.name + " is destroyed!")
                     self.fleet.ships_alive -= 1
-                else:    
+                    board_coords[3] = ""
+                else:
+                    board_coords[3] = ""    
                     print(ship.name + " health = " + str(getattr(ship, "health")))
                 break
         if not is_hit:
@@ -210,8 +219,6 @@ class Game:
         elif self.player2.fleet.ships_alive == 0:
             print("Congratulations " + self.player1.name + " won!")
             return True
-        else:
-            return False
 
     def place_ships(self, player):
         player_ships = []
@@ -237,9 +244,22 @@ class Game:
         self.place_ships(self.player2)
 
     def turn(self):
-        print()
-
+        player = self.player1
+        enemy = self.player2
+        while True:
+            print(player.name + " It's your turn, you have 5 times to shoot.")
+            for a in range(5):
+                coords = str(input("Enter the coords: "))
+                player.shoot(coords, enemy)
+                if self.check_win():
+                    return 0
+            if player == self.player1:
+                player = self.player2
+                enemy = self.player1
+            else:
+                player = self.player1
+                enemy = self.player2
 
 game = Game("Alex", "Test")
 game.start()
-
+game.turn()
