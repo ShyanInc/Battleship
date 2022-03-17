@@ -83,6 +83,8 @@ class Board:
         return result
         
     def coords_to_index(self, coords):
+        if len(coords) == 0:
+            return None
         return (coords[0] * 10 + coords[1])
 
     def get_coords(self, index):
@@ -113,7 +115,7 @@ class Board:
         return current_coords
 
     # Verifies if place is available and occupy it
-    def place_on_board(self, start_coords_index, direction, ship):
+    def place_on_board(self, start_coords_index, direction, ship, fleet):
         current_coords = start_coords_index
         occupied_coords = []
         for temp in range(ship.length, 0, -1):
@@ -122,34 +124,45 @@ class Board:
                 print(f"x:{self.board[current_coords][0]} y:{self.board[current_coords][1]}")
                 current_coords = self.move_placement(current_coords, direction)
                 if current_coords == None:
-                    return None
+                    return False
             else:
                 print("Coordinates are occupied!")
-                return None
+                return False
         for index in occupied_coords:
             self.board[index][2] = True
             self.board[index][3] = ship.name
         print("Ship is placed!")
+        return True
 
     # coords in format "LetterNumber" "A1"
     def place_ship(self, ship_name, start_coords, direction, fleet):
+        if ship_name == "patrol boat":
+            ship_name = "_".join(ship_name.split())
         if hasattr(Fleet, ship_name):
+            ship = getattr(fleet, ship_name)
+            if ship.is_placed == True:
+                print("Ship is already placed!")
+                return None
+
             start_coords = self.coords_to_nums(start_coords)
             if start_coords == None:
                 return None
 
             start_coords_index = self.coords_to_index(start_coords)
+            if start_coords_index == None:
+                return None
 
-            ship = getattr(fleet, ship_name)
-            self.place_on_board(start_coords_index, direction, ship)
-
+            if self.place_on_board(start_coords_index, direction, ship, fleet):
+                return True
         else:
             return "Unknown ship!"
 
 class Player:
+    
     def __init__(self, name):
         self.name = name
-        self.fleet = Fleet(self.name)
+        self.fleet = Fleet(name)
+        self.board = Board()
 
     def __repr__(self):
         description = ""
@@ -182,7 +195,6 @@ class Player:
                 
 
 class Game:
-    board = Board()
 
     def __init__(self, player1_name, player2_name):
         self.player1 = Player(player1_name)
@@ -198,8 +210,37 @@ class Game:
         else:
             return False
 
-player_1 = Player("Alex")
-board.place_ship("patrol_boat", "A1", "up", player_1.fleet)
+    def place_ships(self, player):
+        player_ships = []
+        for ship in player.fleet.ship_names:
+            player_ships.append(ship)
+        while len(player_ships) > 0:
+            print(f"{player.name} place your ships!\nAvailable ships:")
+            i = 1
+            for ship in player_ships:
+                print(str(i) + " - " + ship)
+                i += 1
+            input_ship = str(input("Enter the ship name: "))
+            if input_ship in player.fleet.ship_names:
+                coords = str(input("Enter the coordinates in format x: A-J, y: 0-9: "))
+                direction = str(input("Enter the direction to place (up, down, left, right): "))
+                if player.board.place_ship(input_ship.lower(), coords.upper(), direction.lower(), player.fleet):
+                    player_ships.remove(input_ship.title())
+            else:
+                "Wrong input!"
+            
+    def start(self):
+        self.place_ships(self.player1)
+        self.place_ships(self.player2)
+
+    def turn(self):
+        print()
 
 
+game = Game("Alex", "Test")
+game.start()
+
+# board = Board()
+# player_1 = Player("Alex")
+# board.place_ship("carrier", "A1", "up", player_1.fleet)
 # board.place_ship("carrier", "A6", "up", player_1.fleet)
