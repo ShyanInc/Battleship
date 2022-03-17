@@ -168,14 +168,18 @@ class Player:
         description = ""
         return description
 
-    def shoot(self, coords, board):
-        coords = board.coords_to_nums(coords)
-        coords_index = board.coords_to_index(coords)
-        board_coords = board.get_coords(coords_index)
+    def shoot(self, coords, enemy):
+        coords = enemy.board.coords_to_nums(coords)
+        coords_index = enemy.board.coords_to_index(coords)
+        board_coords = enemy.board.get_coords(coords_index)
         
         is_hit = False
         for name in self.fleet.ship_names:
             if name in board_coords[3]:
+                is_destroyed = getattr(enemy.fleet, name.lower())
+                is_destroyed = getattr(is_destroyed, "is_destroyed")
+                # if is_destroyed == True:
+                    # break
                 is_hit = True
                 if name == "Patrol Boat":
                     name = "_".join(name.split())
@@ -186,7 +190,6 @@ class Player:
                     ship.destroyed()
                     print(ship.name + " is destroyed!")
                     self.fleet.ships_alive -= 1
-                    self.check_status()
                 else:    
                     print(ship.name + " health = " + str(getattr(ship, "health")))
                 break
@@ -239,8 +242,3 @@ class Game:
 
 game = Game("Alex", "Test")
 game.start()
-
-# board = Board()
-# player_1 = Player("Alex")
-# board.place_ship("carrier", "A1", "up", player_1.fleet)
-# board.place_ship("carrier", "A6", "up", player_1.fleet)
