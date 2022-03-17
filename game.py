@@ -24,6 +24,7 @@ class Fleet:
     destroyer = Ship("Destroyer", 3)
     submarine = Ship("Submarine", 3)
     patrol_boat = Ship("Patrol Boat", 2)
+    ships_alive = 5
 
     def __init__(self, owner):
         self.owner = owner
@@ -171,20 +172,34 @@ class Player:
                 if getattr(ship, "health") == 0:
                     ship.destroyed()
                     print(ship.name + " is destroyed!")
+                    self.fleet.ships_alive -= 1
+                    self.check_status()
                 else:    
                     print(ship.name + " health = " + str(getattr(ship, "health")))
                 break
         if not is_hit:
             print("Missed :(")
                 
-                
-        
 
-board = Board()
+class Game:
+    board = Board()
+
+    def __init__(self, player1_name, player2_name):
+        self.player1 = Player(player1_name)
+        self.player2 = Player(player2_name)   
+
+    def check_win(self):
+        if self.player1.fleet.ships_alive == 0:
+            print("Congratulations " + self.player2.name + " won!")
+            return True
+        elif self.player2.fleet.ships_alive == 0:
+            print("Congratulations " + self.player1.name + " won!")
+            return True
+        else:
+            return False
 
 player_1 = Player("Alex")
 board.place_ship("patrol_boat", "A1", "up", player_1.fleet)
-player_1.shoot("A1", board)
-player_1.shoot("A0", board)
+
 
 # board.place_ship("carrier", "A6", "up", player_1.fleet)
