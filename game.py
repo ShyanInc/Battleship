@@ -242,3 +242,4 @@ class Game:
 
 game = Game("Alex", "Test")
 game.start()
+
