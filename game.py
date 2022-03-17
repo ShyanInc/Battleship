@@ -196,7 +196,7 @@ class Player:
                 if getattr(ship, "health") == 0:
                     ship.destroyed()
                     print(ship.name + " is destroyed!")
-                    self.fleet.ships_alive -= 1
+                    enemy.fleet.ships_alive -= 1
                     board_coords[3] = ""
                 else:
                     board_coords[3] = ""    
