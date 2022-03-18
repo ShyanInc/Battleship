@@ -1,9 +1,6 @@
 # Battleship Game For My Codecadamy CS Course
 
 # Creating ships details and methods
-from types import NoneType
-
-
 class Ship:
     def __init__(self, name, length):
         self.name = name
@@ -32,7 +29,7 @@ class Fleet:
         self.submarine = Ship("Submarine", 3)
         self.patrol_boat = Ship("Patrol Boat", 2)
     def __repr__(self):
-        description = ""
+        description = "Fleet class that has all ships info in the game."
         return description
 
 
@@ -53,7 +50,7 @@ class Board:
 
     def __repr__(self):
         print(self.board)
-        description = ""
+        description = "Class that creates player's board to place ships."
         return description
 
     # Checks if given coords are in right format and convert to array[x,y]
@@ -160,14 +157,13 @@ class Board:
             return "Unknown ship!"
 
 class Player:
-    
     def __init__(self, name):
         self.name = name
         self.fleet = Fleet(name)
         self.board = Board()
 
     def __repr__(self):
-        description = ""
+        description = "Player class that has game mechanics methods."
         return description
 
     def shoot(self, coords, enemy):
@@ -211,6 +207,10 @@ class Game:
     def __init__(self, player1_name, player2_name):
         self.player1 = Player(player1_name)
         self.player2 = Player(player2_name)   
+
+    def __repr__(self):
+        description = "The main game class, that contain game logic."
+        return description
 
     def check_win(self):
         if self.player1.fleet.ships_alive == 0:
