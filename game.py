@@ -260,6 +260,15 @@ class Game:
                 player = self.player1
                 enemy = self.player2
 
-game = Game("Alex", "Test")
-game.start()
-game.turn()
+if __name__ == "__main__":
+    while True:
+        player1 = str(input("Enter player's 1 name: "))
+        player2 = str(input("Enter player's 2 name: "))
+        game = Game(player1, player2)
+        game.start()
+        game.turn()
+        replay = str(input("Do you want to replay? Y - yes, N - no: "))
+        yes = ["Yes", "Y", "yes", "y"]
+        if replay not in yes:
+            break
+
